@@ -14,7 +14,7 @@ export default class Images extends Component {
   componentDidMount() {
     this.getImages();
   }
-
+ 
   getImages = () => {
     axios
       .get("http://localhost:8000/api/images")
@@ -38,7 +38,7 @@ export default class Images extends Component {
           <div className="col-xl-6 col-lg-8 col-md-8 col-sm-12 m-auto">
             <div className="card shadow">
               <div className="card-header">
-                <h4 className="card-title fw-bold"> Images List </h4>
+                <h4 className="card-title fw-bold"> My Tray  </h4>
               </div>
               <div className="card-body">
                 <div className="row">
@@ -52,7 +52,7 @@ export default class Images extends Component {
                         </div>
                         ))
                     ) : (
-                        <h6 className="text-danger text-center">No Image Found </h6>
+                        <h6 className="text-danger text-center">No Files  Found </h6>
                     )
                   }
 

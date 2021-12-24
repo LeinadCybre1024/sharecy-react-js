@@ -8,6 +8,7 @@ export default class ImageUpload extends Component {
         super(props);
 
         this.state = {
+          cid:props.location.state,
             image: "",
             responseMsg: {
                 status: "",
@@ -17,18 +18,29 @@ export default class ImageUpload extends Component {
         };
     } 
 
+    componentDidMount() {
+    this.getCid();
+  }
+ 
+  getCid = () => {
+    alert(this.state.cid);
+    if(this.state.cid==null || this.state.cid===""){
+      this.props.history.push('/');
+    }
+  };
+ 
     // image onchange hander
     handleChange = (e) => {
         this.setState({
             image: e.target.files[0]
         })
-    }
+    } 
 
     // submit handler
     submitHandler = (e) => {
         e.preventDefault();
         const data = new FormData() 
-        data.append('images', this.state.image)
+        data.append('image', this.state.image)
 
         axios.post("http://localhost:8000/api/images", data)
         .then((response) => {
@@ -45,6 +57,10 @@ export default class ImageUpload extends Component {
                 responseMsg: "",
                 });
             }, 2000);
+
+            document.querySelector("#imageForm").reset();
+            // getting uploaded images
+            this.refs.child.getImages();
             }
         })
         .catch((error) => {
@@ -59,20 +75,21 @@ export default class ImageUpload extends Component {
           <div className="col-xl-6 col-lg-8 col-md-8 col-sm-12 m-auto">
             <form onSubmit={this.submitHandler} encType="multipart/form-data" id="imageForm">
               <div className="card shadow">
+            
                 {this.state.responseMsg.status === "successs" ? (
                   <div className="alert alert-success">
                     {this.state.responseMsg.message}
                   </div>
                 ) : this.state.responseMsg.status === "failed" ? (
                   <div className="alert alert-danger">
-                    {this.state.responseMsg.message}
+                    {this.state.responseMsg.message + '-'+this.state.responseMsg.status}
                   </div>
                 ) : (
                   ""
                 )}
                 <div className="card-header">
                   <h4 className="card-title fw-bold">
-                    Upload Image in React Using Laravel 8 API
+                    CyberName : {this.state.cid}
                   </h4>
                 </div>
 
@@ -101,50 +118,27 @@ export default class ImageUpload extends Component {
           </div>
         </div>
 
+        <Images />
       </div>
     );
   }
 }
 /*
-import React , {useState}  from "react";
-import "./App.css";
-import Axios from "axios";
+import React, { Component } from 'react';
+import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import ImageUpload from './components/ImageUpload';
 
-function App(){
-const [imagedata,setImagedata]=useState('');
-
-
-const handleChange=(file)=>{
-setImagedata(file[0]);
-    }
-
-    const submitData=(e)=>{
-        e.preventDefault();
-        const fData=new FormData();
-
-        fData.append('image',imagedata);
-
-        Axios.post('http://127.0.0.1:8000/api/images',fData)
-        .then((res) =>{
-            console.log('response',res);
-        }).catch((e)=>{
-            console.error('Faliure',e);
-        });
-
-    }
-    return (
-        <>
-        <form onSubmit={submitData}> 
-
-<label htmlFor="image">Upload Image to Laravel</label>
-<input name="image" id="image" type="file" onChange={e => handleChange(e.target.files)}/>
-<button type="submit" onClick={submitData}>upload</button>
-        </form>
-        </>
-
+class App extends Component {
+    render() {
+        return (
+            <Router>
+                  <Switch>
+                      <Route path="/upload-image" component={ ImageUpload }/>
+                  </Switch>
+            </Router>
         );
+    }
 }
-
 export default App;
 import React from 'react';
 import './App.css';

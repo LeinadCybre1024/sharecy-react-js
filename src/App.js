@@ -1,12 +1,18 @@
 import React , {useState}  from "react";
-import "./App.css";
-import Images from './components/Images';
+
+
+import {BrowserRouter,Route,Switch} from 'react-router-dom';
+import Home from './components/Home';
+import ImageUpload from './components/ImageUpload';
+import Error from './components/Error';
+import Navigation from './components/Navigation';
 import Axios from "axios";
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App(){
+    /*
 const [imagedata,setImagedata]=useState('');
 const [message,setMessage]=useState('');
 
@@ -14,7 +20,7 @@ const [message,setMessage]=useState('');
 const handleChange=(file)=>{
 setImagedata(file[0]);
     }
-
+ 
     const submitData=(e)=>{
         e.preventDefault();
         const fData=new FormData();
@@ -34,56 +40,20 @@ setImagedata(file[0]);
         });
  
     }
-
+*/
 
     return (
         <>
-        
+        <BrowserRouter>
         <div className="container py-5">
-        <div className="row">
-          <div className="col-xl-6 col-lg-8 col-md-8 col-sm-12 m-auto">
-            <form onSubmit={submitData} encType="multipart/form-data" id="imageForm">
-              <div className="card shadow">
-               {message === "success" ? (
-                  <div className="alert alert-success">
-                   Image Uploaded Successfully
-                  </div>
-                ) : message === "nosuccess" ? (
-                  <div className="alert alert-danger">
-                   Image Not Uploade
-                  </div>
-                ) : (
-                  ""
-                )}
-                <div className="card-header">
-                  <h4 className="card-title fw-bold">
-                    Select Files To Share 
-                  </h4>
-                </div>
-
-                <div className="card-body">
-                  <div className="form-group py-2">
-                    <label htmlFor="images">Images</label>
-                    <input
-                      type="file"
-                      name="image"                      
-                      onChange={e => handleChange(e.target.files)}
-                      className="form-control"
-                    />
-                  </div>
-                </div>
-
-                <div className="card-footer">
-                  <button type="submit" onClick={submitData} className="btn btn-success">
-                    Upload
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-<Images />
+        <Navigation />
+        <Switch>
+        <Route path="/" component={Home} exact/>
+        <Route path="/upload" component={ImageUpload} />
+        <Route component={Error}/>
+        </Switch>
       </div>
+      </BrowserRouter>
         </>
 
         );
