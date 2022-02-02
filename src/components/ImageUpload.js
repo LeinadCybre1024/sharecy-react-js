@@ -1,21 +1,32 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Images from "./Images";
+import { useLocation ,Switch} from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+const baseURL="http://localhost:8000/api/files";
 
 export default class ImageUpload extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-          cid:props.location.state,
+          cid:props.location.state.cid,
+          uname:props.location.state.uname,
             image: "",
+            fname:'',
+            value:'',
+            cname:props.location.state.cname,
             responseMsg: {
                 status: "",
                 message: "",
                 error: "",
             },
         };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleChange2 = this.handleChange2.bind(this);
+    this.submitHandler = this.submitHandler.bind(this);
     } 
 
     componentDidMount() {
@@ -23,7 +34,7 @@ export default class ImageUpload extends Component {
   }
  
   getCid = () => {
-    alert(this.state.cid);
+   // alert(this.state.cid);
     if(this.state.cid==null || this.state.cid===""){
       this.props.history.push('/');
     }
@@ -35,14 +46,29 @@ export default class ImageUpload extends Component {
             image: e.target.files[0]
         })
     } 
+//filename onchange handler
+handleChange2 = (e) => {
+  this.setState({value: e.target.value});
+  
+} 
+        
+
 
     // submit handler
     submitHandler = (e) => {
         e.preventDefault();
-        const data = new FormData() 
-        data.append('image', this.state.image)
 
-        axios.post("http://localhost:8000/api/images", data)
+        const formel=document.querySelector("form");
+
+
+
+        let data = new FormData(formel) 
+        data.append('file', this.state.image)
+        data.append('cid',this.state.cid)
+        data.append('uname',this.state.uname)
+        data.append('fname',this.state.value)
+
+        axios.post(baseURL, data)
         .then((response) => {
             if (response.status === 200) {
             this.setState({
@@ -60,8 +86,12 @@ export default class ImageUpload extends Component {
 
             document.querySelector("#imageForm").reset();
             // getting uploaded images
-            this.refs.child.getImages();
+            this.refs.child.getImages(this.state.uname);
             }
+            this.setState({
+              value:''
+            })
+            console.log(response.data.message);
         })
         .catch((error) => {
             console.error(error);
@@ -72,38 +102,50 @@ export default class ImageUpload extends Component {
     return (
       <div className="container py-5">
         <div className="row">
-          <div className="col-xl-6 col-lg-8 col-md-8 col-sm-12 m-auto">
+          <div className="col-xl-6 col-lg-6 col-md-6 col-sm-12 m-auto">
             <form onSubmit={this.submitHandler} encType="multipart/form-data" id="imageForm">
               <div className="card shadow">
             
-                {this.state.responseMsg.status === "successs" ? (
+                {this.state.status === "successs" ? (
                   <div className="alert alert-success">
-                    {this.state.responseMsg.message}
+                    {this.state.message}
                   </div>
-                ) : this.state.responseMsg.status === "failed" ? (
+                ) : this.state.status === "failed" ? (
                   <div className="alert alert-danger">
-                    {this.state.responseMsg.message + '-'+this.state.responseMsg.status}
+                    {this.state.message + '-'+this.state.status}
                   </div>
                 ) : (
                   ""
                 )}
                 <div className="card-header">
                   <h4 className="card-title fw-bold">
-                    CyberName : {this.state.cid}
+                    CyberName : {this.state.cname}
+                  </h4>
+                  
+                  <h4 className="card-title fw-bold">
+                    Uname : {this.state.uname}
                   </h4>
                 </div>
 
                 <div className="card-body">
                   <div className="form-group py-2">
-                    <label htmlFor="images">Images</label>
+                    <label htmlFor="images">Upload Your Files Here:</label>
                     <input
                       type="file"
-                      name="image"                      
+                      name="file"                      
                       onChange={this.handleChange}
                       className="form-control"
                     />
+                    <br/>
+                    <label>Filename</label><br/>
+                    <input type="text"
+                    name="fname"
+                    value={this.state.value}
+                    onChange={this.handleChange2}
+                    className="form-control"
+                    />
                     <span className="text-danger">
-                      {this.state.responseMsg.error}
+                      {this.state.error}
                     </span>
                   </div>
                 </div>
@@ -116,9 +158,10 @@ export default class ImageUpload extends Component {
               </div>
             </form>
           </div>
+          <div className="col-xl-6 col-lg-6 col-md-6 col-sm-12 m-auto">
+          <Images ref='child'/>
+          </div>
         </div>
-
-        <Images />
       </div>
     );
   }

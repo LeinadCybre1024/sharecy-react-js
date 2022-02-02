@@ -1,13 +1,26 @@
 import React , {useState}  from "react";
-import {useNavigate} from "react-router-dom";
+import axios from 'axios';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 class Home extends React.Component {
 	//let navigate = useNavigate{};
+  componentDidMount(){
+    document.title = "CyberShare"
+  }
   constructor(props) {
     super(props);
-    this.state = {value: '',message:''};
+    this.state = {value: '',
+    message:'',
+    uname:'',
+    statuss:'',
+    cname:'',
+    responseMsg: {
+      status: "",
+      message: "",
+      uname: "",
+  },
+};
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -21,19 +34,57 @@ this.setState({message:""});
   }
 
   handleSubmit(event) {
+    const data = new FormData() 
     if(this.state.value==null || this.state.value===""){
       event.preventDefault();
-this.setState({message:"failed"});
+this.setState({statuss:"failed"});
+this.setState({responseMsg:{message:"Enter Cyber ID to Continue "},});
     }else{
      event.preventDefault();
+
+     data.append('cyber',this.state.value)
+
+     axios.post("http://localhost:8000/api/cyber", data)
+        .then((response) => {
+            if (response.status === 200) {
+            this.setState({
+              uname:response.data.uname,
+              responseMsg:{
+                message:response.data.message,
+              },
+              statuss:response.data.status,
+              cname:response.data.cname,
+            });
+            setTimeout(() => {
+                this.setState({
+                image: "",
+                responseMsg: "",
+                });
+            }, 2000);
+
+            console.log("submitted ");
+            //do your task here before redirect
+            //...
+            if(response.data.status == 'successs')
+            {
+              this.props.history.push({
+                pathname:'/upload',
+                state:{cid:this.state.value,uname:response.data.uname,cname:response.data.cname}
+               });
+            }else{
+              this.state.value="";
+              this.state.statuss="";
+            }
+           
+
+           
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+        });
     
-    console.log("submitted");
-    //do your task here before redirect
-    //...
-   this.props.history.push({
-    pathname:'/upload',
-    state:this.state.value
-   });
+    
  }
   }
 
@@ -44,9 +95,9 @@ this.setState({message:"failed"});
          <div className="card shadow">
       <form onSubmit={this.handleSubmit}>
       <div className="card-header">
-       {this.state.message=== "failed" ? (
+       {this.state.statuss=== "failed" ? (
                   <div className="alert alert-danger">
-                   Enter Cyber ID to Continue
+                   {this.state.responseMsg.message}
                   </div>
                 ) : (
                   ""
@@ -65,7 +116,7 @@ this.setState({message:"failed"});
                 </div>
 
                 <div className="card-footer">
-        <input className="btn btn-primary" type="submit" value="Create Tray" />
+        <input className="btn btn-primary" type="submit" value="Open Tray" />
          </div>
           </form>
               </div>

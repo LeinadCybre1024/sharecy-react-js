@@ -6,13 +6,20 @@ import Home from './components/Home';
 import ImageUpload from './components/ImageUpload';
 import Error from './components/Error';
 import Navigation from './components/Navigation';
-import Axios from "axios";
+import Login from './components/Login';
+import Dash from './admin/Dash';
+
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App(){
+     // This effect runs once, after the first render
+  
     /*
+    componentDidMount(){
+    document.title = "dfsdfsdfsd"
+  }
 const [imagedata,setImagedata]=useState('');
 const [message,setMessage]=useState('');
 
@@ -40,7 +47,7 @@ setImagedata(file[0]);
         });
  
     }
-*/
+*/ 
 
     return (
         <>
@@ -49,7 +56,9 @@ setImagedata(file[0]);
         <Navigation />
         <Switch>
         <Route path="/" component={Home} exact/>
+        <Route path="/signin" component={Login} exact/>
         <Route path="/upload" component={ImageUpload} />
+        <Route path="/dash" component={Dash} />
         <Route component={Error}/>
         </Switch>
       </div>
